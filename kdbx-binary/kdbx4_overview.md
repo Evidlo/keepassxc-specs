@@ -125,7 +125,7 @@ Where **type** denotes one of the following item types:
 Decrypt concatenated **block_data** using AES256-CBC with key **master_key** and IV **encryption_iv**.
 
 #### twofish
-WIP
+Decrypt concatenated **block_data** using Twofish CBC with key **master_key** and IV **encryption_iv**.
 
 #### chacha20
 Decrypt concatenated **block_data** using ChaCha20 cipher with key **master_key** and nonce **encryption_iv**
