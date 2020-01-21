@@ -1,0 +1,239 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- name="GENERATOR" content="github.com/mmarkdown/mmark Mmark Markdown Processor - mmark.miek.nl" -->
+<rfc version="3" ipr="trust200902" docName="draft-keepass-01" submissionType="IETF" category="info" xml:lang="en" xmlns:xi="http://www.w3.org/2001/XInclude" consensus="true">
+
+<front>
+<title>KeePass RFC</title><seriesInfo value="draft-keepass-01" stream="IETF" status="informational" name="Internet-Draft"></seriesInfo>
+<author initials="E." surname="Widloski" fullname="E. Widloski"><organization></organization><address><postal><street></street>
+</postal></address></author>
+<date/>
+<area>Security</area>
+<workgroup></workgroup>
+
+<abstract>
+<t>This is a small test document!!</t>
+</abstract>
+
+</front>
+
+<middle>
+
+<section anchor="keepass-head-style-1"><name>KeePass Head (style 1)</name>
+
+<artwork align="center"> Length    Name                  Data Type
+ -------   -------------------   -------------
+       4   magic1
+       4   magic2                LE uint32
+       2   major_version         LE uint16
+       2   minor_version         LE uint16
+       *   header_item           HeaderItem
+      32   header_integrity  
+      32   header_authenticity   
+       *   payload
+</artwork>
+
+<dl>
+<dt>magic1:</dt>
+<dd><t>4 unique bytes for filetype identification</t>
+</dd>
+<dt>magic2:</dt>
+<dd><t>4 unique bytes for filetype identification</t>
+</dd>
+<dt>major_version:</dt>
+<dd><t>int representing database major version (e.g. '4')</t>
+</dd>
+<dt>minor_version:</dt>
+<dd><t>int representing database major version (e.g. '0')</t>
+</dd>
+<dt>header_items:</dt>
+<dd><t>variable length item containing information about encryption, compression, key derivation or plugin data (see Section <xref target="HeaderItem"></xref>)</t>
+</dd>
+<dt>header_integrity:</dt>
+<dd><t>SHA256 hash of header for detecting unintentional corruptions.  Computed as <tt>SHA256(m)</tt> where m is all bytes starting from the beginning of file to the last byte of the last HeaderItem (inclusive).</t>
+</dd>
+<dt>header_authenticity:</dt>
+<dd><t>HMAC-SHA256 hash of header for verifying database authenticity.  Computed as <tt>HMAC-SHA256(K, m)</tt> where m is all bytes starting from the beginning of the file to the last byte of the last HeaderItem (inclusive).  K is the secret key, computed as <tt>SHA512(\xff * 8 || SHA512(master_seed || transformed_key || \x01))</tt> where || represents concatenation and * represents byte duplication.  master<em>seed and transformed</em>key can be found in header_items.</t>
+</dd>
+</dl>
+</section>
+
+<section anchor="keepass-head-style-2"><name>KeePass Head (style 2)</name>
+<table>
+<thead>
+<tr>
+<th>Length 1</th>
+<th>Name</th>
+<th>Type</th>
+<th>Meaning</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td>4</td>
+<td>magic1</td>
+<td></td>
+<td>4 unique bytes for filesystem identification</td>
+</tr>
+
+<tr>
+<td>4</td>
+<td>magic2</td>
+<td></td>
+<td>4 unique bytes for filesystem identification</td>
+</tr>
+
+<tr>
+<td>2</td>
+<td>major_version</td>
+<td>LE uint16</td>
+<td>int representing database major version (e.g. '4')</td>
+</tr>
+
+<tr>
+<td>2</td>
+<td>minor_version</td>
+<td>LE uint16</td>
+<td>int representing database minor version (e.g. '0')</td>
+</tr>
+
+<tr>
+<td>*</td>
+<td>dynamic_header</td>
+<td>DynamicHeader</td>
+<td>holds encryption and compression information about the payload variable length item containing information about encryption, compression, key derivation or plugin data (see Section <xref target="HeaderItem"></xref>)</td>
+</tr>
+</tbody>
+</table></section>
+
+<section anchor="keepass-head-style-3"><name>KeePass Head (style 3)</name>
+<table align="center"><name>testing foo
+</name>
+<thead>
+<tr>
+<th>Length</th>
+<th>Name</th>
+<th>Type</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td>4</td>
+<td>magic1</td>
+<td></td>
+</tr>
+
+<tr>
+<td>4</td>
+<td>magic2</td>
+<td>LE uint32</td>
+</tr>
+
+<tr>
+<td>2</td>
+<td>major_version</td>
+<td>LE uint16</td>
+</tr>
+
+<tr>
+<td>2</td>
+<td>minor_version</td>
+<td>LE uint16</td>
+</tr>
+
+<tr>
+<td>*</td>
+<td>dynamic_header</td>
+<td>DynamicHeader</td>
+</tr>
+
+<tr>
+<td>32</td>
+<td>sha256</td>
+<td></td>
+</tr>
+
+<tr>
+<td>32</td>
+<td>hmac_sha256</td>
+<td></td>
+</tr>
+
+<tr>
+<td>*</td>
+<td>payload</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<dl>
+<dt>magic1:</dt>
+<dd><t>4 unique bytes for filetype identification</t>
+</dd>
+<dt>magic2:</dt>
+<dd><t>4 unique bytes for filetype identification</t>
+</dd>
+<dt>major_version:</dt>
+<dd><t>int representing database major version (e.g. '4')</t>
+</dd>
+<dt>minor_version:</dt>
+<dd><t>int representing database major version (e.g. '0')</t>
+</dd>
+<dt>header_item:</dt>
+<dd><t>variable length item containing information about encryption, compression, key derivation or plugin data (see Section <xref target="HeaderItem"></xref>)</t>
+</dd>
+</dl>
+
+<section anchor="HeaderItem"><name>HeaderItem</name>
+<t>foobar</t>
+</section>
+</section>
+
+<section anchor="keepass-head-style-4"><name>KeePass Head (style 4)</name>
+
+<artwork align="center"> Length    Name                  Data Type
+ -------   -------------------   -------------
+       4   magic1
+       4   magic2                LE uint32
+       2   major_version         LE uint16
+       2   minor_version         LE uint16
+       *   header_item           HeaderItem
+      32   header_integrity  
+      32   header_authenticity   
+       *   payload
+</artwork>
+
+<ul>
+<li><t><tt>magic</tt> - 4 bytes. used for filetype identification</t>
+</li>
+</ul>
+
+<dl>
+<dt>magic1:</dt>
+<dd><t>4 unique bytes for filetype identification</t>
+</dd>
+<dt>magic2:</dt>
+<dd><t>4 unique bytes for filetype identification</t>
+</dd>
+<dt>major_version:</dt>
+<dd><t>int representing database major version (e.g. '4')</t>
+</dd>
+<dt>minor_version:</dt>
+<dd><t>int representing database major version (e.g. '0')</t>
+</dd>
+<dt>header_items:</dt>
+<dd><t>variable length item containing information about encryption, compression, key derivation or plugin data (see Section <xref target="HeaderItem"></xref>)</t>
+</dd>
+<dt>header_integrity:</dt>
+<dd><t>SHA256 hash of header for detecting unintentional corruptions.  Computed as <tt>SHA256(m)</tt> where m is all bytes starting from the beginning of file to the last byte of the last HeaderItem (inclusive).</t>
+</dd>
+<dt>header_authenticity:</dt>
+<dd><t>HMAC-SHA256 hash of header for verifying database authenticity.  Computed as <tt>HMAC-SHA256(K, m)</tt> where m is all bytes starting from the beginning of the file to the last byte of the last HeaderItem (inclusive).  K is the secret key, computed as <tt>SHA512(\xff * 8 || SHA512(master_seed || transformed_key || \x01))</tt> where || represents concatenation and * represents byte duplication.  master<em>seed and transformed</em>key can be found in header_items.</t>
+</dd>
+</dl>
+</section>
+
+</middle>
+
+</rfc>

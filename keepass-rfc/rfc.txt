@@ -1,0 +1,280 @@
+
+
+
+
+Network Working Group                                        E. Widloski
+Internet-Draft                                         18 September 2019
+Intended status: Informational                                          
+Expires: 21 March 2020
+
+
+                              KeePass RFC
+                            draft-keepass-01
+
+Abstract
+
+   This is a small test document!!
+
+Status of This Memo
+
+   This Internet-Draft is submitted in full conformance with the
+   provisions of BCP 78 and BCP 79.
+
+   Internet-Drafts are working documents of the Internet Engineering
+   Task Force (IETF).  Note that other groups may also distribute
+   working documents as Internet-Drafts.  The list of current Internet-
+   Drafts is at https://datatracker.ietf.org/drafts/current/.
+
+   Internet-Drafts are draft documents valid for a maximum of six months
+   and may be updated, replaced, or obsoleted by other documents at any
+   time.  It is inappropriate to use Internet-Drafts as reference
+   material or to cite them other than as "work in progress."
+
+   This Internet-Draft will expire on 21 March 2020.
+
+Copyright Notice
+
+   Copyright (c) 2019 IETF Trust and the persons identified as the
+   document authors.  All rights reserved.
+
+   This document is subject to BCP 78 and the IETF Trust's Legal
+   Provisions Relating to IETF Documents (https://trustee.ietf.org/
+   license-info) in effect on the date of publication of this document.
+   Please review these documents carefully, as they describe your rights
+   and restrictions with respect to this document.  Code Components
+   extracted from this document must include Simplified BSD License text
+   as described in Section 4.e of the Trust Legal Provisions and are
+   provided without warranty as described in the Simplified BSD License.
+
+
+
+
+
+
+
+
+Widloski                  Expires 21 March 2020                 [Page 1]
+
+Internet-Draft                 KeePass RFC                September 2019
+
+
+Table of Contents
+
+   1.  KeePass Head (style 1)  . . . . . . . . . . . . . . . . . . .   2
+   2.  KeePass Head (style 2)  . . . . . . . . . . . . . . . . . . .   3
+   3.  KeePass Head (style 3)  . . . . . . . . . . . . . . . . . . .   3
+     3.1.  HeaderItem  . . . . . . . . . . . . . . . . . . . . . . .   4
+   4.  KeePass Head (style 4)  . . . . . . . . . . . . . . . . . . .   4
+
+1.  KeePass Head (style 1)
+
+               Length    Name                  Data Type
+               -------   -------------------   -------------
+                     4   magic1
+                     4   magic2                LE uint32
+                     2   major_version         LE uint16
+                     2   minor_version         LE uint16
+                     *   header_item           HeaderItem
+                    32   header_integrity
+                    32   header_authenticity
+                     *   payload
+
+   magic1:  4 unique bytes for filetype identification
+
+   magic2:  4 unique bytes for filetype identification
+
+   major_version:  int representing database major version (e.g. '4')
+
+   minor_version:  int representing database major version (e.g. '0')
+
+   header_items:  variable length item containing information about
+      encryption, compression, key derivation or plugin data (see
+      Section Section 3.1)
+
+   header_integrity:  SHA256 hash of header for detecting unintentional
+      corruptions.  Computed as "SHA256(m)" where m is all bytes
+      starting from the beginning of file to the last byte of the last
+      HeaderItem (inclusive).
+
+   header_authenticity:  HMAC-SHA256 hash of header for verifying
+      database authenticity.  Computed as "HMAC-SHA256(K, m)" where m is
+      all bytes starting from the beginning of the file to the last byte
+      of the last HeaderItem (inclusive).  K is the secret key, computed
+      as "SHA512(\xff * 8 || SHA512(master_seed || transformed_key ||
+      \x01))" where || represents concatenation and * represents byte
+      duplication.  master_seed and transformed_key can be found in
+      header_items.
+
+
+
+
+
+Widloski                  Expires 21 March 2020                 [Page 2]
+
+Internet-Draft                 KeePass RFC                September 2019
+
+
+2.  KeePass Head (style 2)
+
+   +--------+----------------+---------------+-------------------------+
+   | Length | Name           | Type          | Meaning                 |
+   | 1      |                |               |                         |
+   +========+================+===============+=========================+
+   | 4      | magic1         |               | 4 unique bytes for      |
+   |        |                |               | filesystem              |
+   |        |                |               | identification          |
+   +--------+----------------+---------------+-------------------------+
+   | 4      | magic2         |               | 4 unique bytes for      |
+   |        |                |               | filesystem              |
+   |        |                |               | identification          |
+   +--------+----------------+---------------+-------------------------+
+   | 2      | major_version  | LE uint16     | int representing        |
+   |        |                |               | database major version  |
+   |        |                |               | (e.g. '4')              |
+   +--------+----------------+---------------+-------------------------+
+   | 2      | minor_version  | LE uint16     | int representing        |
+   |        |                |               | database minor version  |
+   |        |                |               | (e.g. '0')              |
+   +--------+----------------+---------------+-------------------------+
+   | *      | dynamic_header | DynamicHeader | holds encryption and    |
+   |        |                |               | compression             |
+   |        |                |               | information about the   |
+   |        |                |               | payload variable        |
+   |        |                |               | length item containing  |
+   |        |                |               | information about       |
+   |        |                |               | encryption,             |
+   |        |                |               | compression, key        |
+   |        |                |               | derivation or plugin    |
+   |        |                |               | data (see               |
+   |        |                |               | Section Section 3.1)    |
+   +--------+----------------+---------------+-------------------------+
+
+                                  Table 1
+
+3.  KeePass Head (style 3)
+
+                +--------+----------------+---------------+
+                | Length | Name           | Type          |
+                +========+================+===============+
+                | 4      | magic1         |               |
+                +--------+----------------+---------------+
+                | 4      | magic2         | LE uint32     |
+                +--------+----------------+---------------+
+                | 2      | major_version  | LE uint16     |
+                +--------+----------------+---------------+
+
+
+
+Widloski                  Expires 21 March 2020                 [Page 3]
+
+Internet-Draft                 KeePass RFC                September 2019
+
+
+                | 2      | minor_version  | LE uint16     |
+                +--------+----------------+---------------+
+                | *      | dynamic_header | DynamicHeader |
+                +--------+----------------+---------------+
+                | 32     | sha256         |               |
+                +--------+----------------+---------------+
+                | 32     | hmac_sha256    |               |
+                +--------+----------------+---------------+
+                | *      | payload        |               |
+                +--------+----------------+---------------+
+
+                            Table 2: testing foo
+
+   magic1:  4 unique bytes for filetype identification
+
+   magic2:  4 unique bytes for filetype identification
+
+   major_version:  int representing database major version (e.g. '4')
+
+   minor_version:  int representing database major version (e.g. '0')
+
+   header_item:  variable length item containing information about
+      encryption, compression, key derivation or plugin data (see
+      Section Section 3.1)
+
+3.1.  HeaderItem
+
+   foobar
+
+4.  KeePass Head (style 4)
+
+               Length    Name                  Data Type
+               -------   -------------------   -------------
+                     4   magic1
+                     4   magic2                LE uint32
+                     2   major_version         LE uint16
+                     2   minor_version         LE uint16
+                     *   header_item           HeaderItem
+                    32   header_integrity
+                    32   header_authenticity
+                     *   payload
+
+   *  "magic" - 4 bytes. used for filetype identification
+
+   magic1:  4 unique bytes for filetype identification
+
+   magic2:  4 unique bytes for filetype identification
+
+
+
+
+Widloski                  Expires 21 March 2020                 [Page 4]
+
+Internet-Draft                 KeePass RFC                September 2019
+
+
+   major_version:  int representing database major version (e.g. '4')
+
+   minor_version:  int representing database major version (e.g. '0')
+
+   header_items:  variable length item containing information about
+      encryption, compression, key derivation or plugin data (see
+      Section Section 3.1)
+
+   header_integrity:  SHA256 hash of header for detecting unintentional
+      corruptions.  Computed as "SHA256(m)" where m is all bytes
+      starting from the beginning of file to the last byte of the last
+      HeaderItem (inclusive).
+
+   header_authenticity:  HMAC-SHA256 hash of header for verifying
+      database authenticity.  Computed as "HMAC-SHA256(K, m)" where m is
+      all bytes starting from the beginning of the file to the last byte
+      of the last HeaderItem (inclusive).  K is the secret key, computed
+      as "SHA512(\xff * 8 || SHA512(master_seed || transformed_key ||
+      \x01))" where || represents concatenation and * represents byte
+      duplication.  master_seed and transformed_key can be found in
+      header_items.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Widloski                  Expires 21 March 2020                 [Page 5]
